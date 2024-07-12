@@ -7,7 +7,7 @@ pipeline {
 
         stage('Build docker image') {
             steps {
-                sh 'sudo docker build -t myapp/flask:$BUILD_NUMBER .'
+                sh 'docker build -t myapp/flask:$BUILD_NUMBER .'
             }
         }
         stage('login to dockerhub') {
@@ -17,13 +17,13 @@ pipeline {
         }
         stage('push image') {
             steps{
-                sh 'sudo docker push myapp/flask:$BUILD_NUMBER'
+                sh 'docker push myapp/flask:$BUILD_NUMBER'
             }
         }
 }
 post {
         always {
-            sh 'sudo docker logout'
+            sh 'docker logout'
         }
     }
 }

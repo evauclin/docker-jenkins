@@ -1,3 +1,3 @@
 # jenkins-docker
 
-#kdk,dkd
+#kd

@@ -1,12 +1,16 @@
 pipeline {
-    agent any 
-    environment {
-    DOCKERHUB_CREDENTIALS = credentials('etienne-dockerhub')
+    agent {
+        docker {
+            image 'docker:19.03.12'
+            args '-v /var/run/docker.sock:/var/run/docker.sock'
+        }
     }
-    stages { 
-
+    environment {
+        DOCKERHUB_CREDENTIALS = credentials('etienne-dockerhub')
+    }
+    stages {
         stage('Build docker image') {
-            steps {  
+            steps {
                 sh 'docker build -t myapp/flask:$BUILD_NUMBER .'
             }
         }
@@ -20,8 +24,8 @@ pipeline {
                 sh 'docker push myapp/flask:$BUILD_NUMBER'
             }
         }
-}
-post {
+    }
+    post {
         always {
             sh 'docker logout'
         }

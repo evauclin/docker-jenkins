@@ -6,8 +6,8 @@ pipeline {
     environment {
         DOCKERHUB_CREDENTIALS = credentials('etienne-dockerhub')
         TRIVY_VERSION = '0.42.0'
-        AWS_ACCESS_KEY_ID = credentials('AWS_ACCESS_KEY_ID')
-        AWS_SECRET_ACCESS_KEY = credentials('AWS_SECRET_ACCESS_KEY')
+        AWS_ACCESS_KEY_ID = credentials('Access key ID')
+        AWS_SECRET_ACCESS_KEY = credentials('Secret access key')
     }
     stages {
         stage('Build docker image') {

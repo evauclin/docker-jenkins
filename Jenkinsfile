@@ -25,20 +25,6 @@ pipeline {
                 sh 'docker push 9722411/flask:$BUILD_NUMBER'
             }
         }
-/*        stage('Trivy Scan') {
-            steps {
-                script {
-                    def trivyInstalled = sh(script: 'which trivy', returnStatus: true) == 0
-                    if (!trivyInstalled) {
-                        sh """
-                            wget https://github.com/aquasecurity/trivy/releases/latest/download/trivy_${TRIVY_VERSION}_Linux-64bit.deb
-                            sudo dpkg -i trivy_${TRIVY_VERSION}_Linux-64bit.deb
-                        """
-                    }
-                }
-                sh 'trivy image --severity HIGH,CRITICAL 9722411/flask:$BUILD_NUMBER'
-            }
-        }*/
         stage('Checkout Terraform') {
             steps {
                 script {

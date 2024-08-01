@@ -5,6 +5,9 @@ pipeline {
     }
     environment {
         DOCKERHUB_CREDENTIALS = credentials('etienne-dockerhub')
+        TRIVY_VERSION = '0.42.0'
+        AWS_ACCESS_KEY_ID = credentials('Access key ID')
+        AWS_SECRET_ACCESS_KEY = credentials('Secret access key')
     }
     stages {
         stage('Build docker image') {
@@ -22,8 +25,55 @@ pipeline {
                 sh 'docker push 9722411/flask:$BUILD_NUMBER'
             }
         }
+        stage('Checkout Terraform') {
+            steps {
+                script {
+                    dir("terraform") {
+                        git 'https://github.com/evauclin/docker-jenkins.git'
+                    }
+                }
+            }
+        }
+        stage('Terraform Plan') {
+            steps {
+                script {
+                    dir("terraform") {
+                        sh 'terraform init'
+                        sh 'terraform plan -out tfplan'
+                        sh 'terraform show -no-color tfplan > tfplan.txt'
+                    }
+                }
+            }
+        }
+        stage('Approval') {
+            when {
+                not {
+                    equals expected: true, actual: params.autoApprove
+                }
+            }
+            steps {
+                script {
+                    dir("terraform") {
+                        def plan = readFile 'tfplan.txt'
+                        input message: 'Do you want to apply the plan?',
+                        parameters: [text(name: 'Plan', description: 'Please review the plan', defaultValue: plan)]
+                    }
+                }
+            }
+        }
+        stage('Terraform Apply') {
+            steps {
+                script {
+                    dir("terraform") {
+                        sh 'terraform apply -input=false tfplan'
+                    }
+                }
+            }
+        }
+    }
     post {
         always {
             sh 'docker logout'
         }
     }
+}
